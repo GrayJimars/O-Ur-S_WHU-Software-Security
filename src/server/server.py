@@ -1,24 +1,77 @@
+# -*- coding: utf-8 -*-
 import socket
+import asyncio
+import threading
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5 import QtCore, QtGui, QtWidgets
+from Ui_server import *
 
-def handle_client(client_socket):
-    request = client_socket.recv(1024)
-    print(f"[*] Received: {request}")
-    client_socket.send("ACK!".encode())
-    client_socket.close()
-   
-def start_server(client_address):
-    tcp_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # 创建socket对象，走tcp通道
-    tcp_server.bind(client_address) # 绑定地址
-    tcp_server.listen(5) # 设置最大连接数，超过后排队
-    print("[*] Listening on: %s:%d" % client_address)
-    
-    while True:
-        client_socket, addr = tcp_server.accept() # 建立客户端连接
-        print(f"[*] Accepted connection from: {addr[0]}:{addr[1]}")
-        handle_client(client_socket) # 处理客户端请求 
+class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
+        self.serverState.setText("Not Listening")
+        self.server_task = None
+        self.loop = asyncio.new_event_loop()
+        self.startServer.clicked.connect(self.startServerClicked)
+        self.stopServer.clicked.connect(self.stopServerClicked)
+        
+    def startServerClicked(self):
+        self.startServer.setEnabled(False)
+        self.stopServer.setEnabled(True)
+        client_host = socket.gethostname()
+        client_port = 25566
+        client_address = (client_host, client_port)
 
-client_host = socket.gethostname() # 获取本地主机名
-client_port = 25566 # 端口号
-client_address = (client_host, client_port)
+        # 创建一个事件循环运行服务器
+        asyncio.run_coroutine_threadsafe(self.start_server(client_address), self.loop)
+        threading.Thread(target=self.run_event_loop, daemon=True).start()
 
-start_server(client_address)
+    def run_event_loop(self):
+        asyncio.set_event_loop(self.loop)
+        self.loop.run_forever()
+
+    async def start_server(self, client_address):
+        self.textBrowser.append(f"[*] Starting server on {client_address[0]}:{client_address[1]}")
+        self.serverState.setText("Listening")
+        try:
+            server = await asyncio.start_server(self.handle_client, *client_address)
+            self.textBrowser.append(f"[*] Server is running on {client_address[0]}:{client_address[1]}")
+            async with server:
+                self.server_task = server
+                await server.serve_forever()
+        except ConnectionResetError as e:
+            self.textBrowser.append(f"[!] Connection reset error: {e}")
+            self.serverState.setText("Not Listening")
+        except Exception as e:
+            self.textBrowser.append(f"[!] An error occurred: {e}")
+            self.serverState.setText("Not Listening")
+
+    def stopServerClicked(self):
+        self.startServer.setEnabled(True)
+        self.stopServer.setEnabled(False)
+        if self.server_task:
+            self.server_task.close()
+            self.loop.call_soon_threadsafe(self.loop.stop)
+            self.serverState.setText("Stopped")
+            self.textBrowser.append("[*] Server stopped")
+
+    async def handle_client(self, reader, writer):
+        addr = writer.get_extra_info('peername')
+        self.textBrowser.append(f"[*] Accepted connection from {addr[0]}:{addr[1]}")
+
+        # 发送一条消息
+        writer.write(b"Hello, you are connected!\n")
+        await writer.drain()
+
+        # 关闭连接
+        writer.close()
+        await writer.wait_closed()
+
+if __name__ == "__main__":
+    import sys
+    from PyQt5.QtWidgets import QApplication
+    app = QApplication(sys.argv)
+    window = Server()
+    window.show()
+    sys.exit(app.exec_())
