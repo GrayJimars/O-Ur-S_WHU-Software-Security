@@ -15,6 +15,8 @@ class Ui_ServerMainWindow(object):
     def setupUi(self, ServerMainWindow):
         ServerMainWindow.setObjectName("ServerMainWindow")
         ServerMainWindow.resize(320, 240)
+        ServerMainWindow.setMinimumSize(QtCore.QSize(320, 240))
+        ServerMainWindow.setMaximumSize(QtCore.QSize(320, 240))
         self.centralwidget = QtWidgets.QWidget(ServerMainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)

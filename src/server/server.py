@@ -3,7 +3,7 @@ import socket
 import asyncio
 import threading
 from PyQt5.QtWidgets import QMessageBox
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from Ui_server import *
 from operation_modules import *
 

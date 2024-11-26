@@ -15,6 +15,8 @@ class Ui_ClientMainWindow(object):
     def setupUi(self, ClientMainWindow):
         ClientMainWindow.setObjectName("ClientMainWindow")
         ClientMainWindow.resize(1280, 800)
+        ClientMainWindow.setMinimumSize(QtCore.QSize(1280, 800))
+        ClientMainWindow.setMaximumSize(QtCore.QSize(1280, 800))
         self.centralwidget = QtWidgets.QWidget(ClientMainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
@@ -65,7 +67,7 @@ class Ui_ClientMainWindow(object):
 
     def retranslateUi(self, ClientMainWindow):
         _translate = QtCore.QCoreApplication.translate
-        ClientMainWindow.setWindowTitle(_translate("ClientMainWindow", "MainWindow"))
+        ClientMainWindow.setWindowTitle(_translate("ClientMainWindow", "客户端（控制端）"))
         self.label.setText(_translate("ClientMainWindow", "服务端地址"))
         self.label_2.setText(_translate("ClientMainWindow", "服务端端口"))
         self.fileManager.setText(_translate("ClientMainWindow", "文件管理"))
