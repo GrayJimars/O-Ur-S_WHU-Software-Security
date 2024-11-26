@@ -3,7 +3,7 @@ import socket
 import asyncio
 import threading
 from PyQt5.QtWidgets import QMessageBox
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from Ui_server import *
 
 class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
@@ -15,7 +15,15 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
         self.loop = asyncio.new_event_loop()
         self.startServer.clicked.connect(self.startServerClicked)
         self.stopServer.clicked.connect(self.stopServerClicked)
-        
+
+    def log_message(self, message):
+        QtCore.QMetaObject.invokeMethod(
+            self.textBrowser,
+            "append",
+            QtCore.Qt.QueuedConnection,
+            QtCore.Q_ARG(str, message),
+        )
+
     def startServerClicked(self):
         self.startServer.setEnabled(False)
         self.stopServer.setEnabled(True)
@@ -32,19 +40,16 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
         self.loop.run_forever()
 
     async def start_server(self, client_address):
-        self.textBrowser.append(f"[*] Starting server on {client_address[0]}:{client_address[1]}")
+        self.log_message(f"[*] Starting server on {client_address[0]}:{client_address[1]}")
         self.serverState.setText("Listening")
         try:
             server = await asyncio.start_server(self.handle_client, *client_address)
-            self.textBrowser.append(f"[*] Server is running on {client_address[0]}:{client_address[1]}")
+            self.server_task = server
             async with server:
-                self.server_task = server
+                self.log_message(f"[*] Server is running on {client_address[0]}:{client_address[1]}")
                 await server.serve_forever()
-        except ConnectionResetError as e:
-            self.textBrowser.append(f"[!] Connection reset error: {e}")
-            self.serverState.setText("Not Listening")
         except Exception as e:
-            self.textBrowser.append(f"[!] An error occurred: {e}")
+            self.log_message(f"[!] An error occurred: {e}")
             self.serverState.setText("Not Listening")
 
     def stopServerClicked(self):
@@ -53,20 +58,36 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
         if self.server_task:
             self.server_task.close()
             self.loop.call_soon_threadsafe(self.loop.stop)
+            self.log_message("[*] Server stopped")
             self.serverState.setText("Stopped")
-            self.textBrowser.append("[*] Server stopped")
 
     async def handle_client(self, reader, writer):
         addr = writer.get_extra_info('peername')
-        self.textBrowser.append(f"[*] Accepted connection from {addr[0]}:{addr[1]}")
+        self.log_message(f"[*] Accepted connection from {addr[0]}:{addr[1]}")
 
-        # 发送一条消息
-        writer.write(b"Hello, you are connected!\n")
-        await writer.drain()
+        try:
+            # 读取客户端发送的数据
+            self.log_message(f"[*] Waiting for data from {addr[0]}:{addr[1]}...")
+            data = await reader.read(1024)
+            message = data.decode()
+            self.log_message(f"[*] Received: {message}")
 
-        # 关闭连接
-        writer.close()
-        await writer.wait_closed()
+            # 发送响应数据
+            response = "Hello, Client!"
+            writer.write(response.encode())
+            await writer.drain()
+            self.log_message(f"[*] Response sent: {response}")
+        except Exception as e:
+            self.log_message(f"[!] Error handling client {addr}: {str(e)}")
+        finally:
+            # 关闭连接
+            writer.close()
+            await writer.wait_closed()
+            self.log_message(f"[*] Connection with {addr[0]}:{addr[1]} closed")
+
+    def closeEvent(self, event):
+        self.loop.call_soon_threadsafe(self.loop.stop)
+        event.accept()
 
 if __name__ == "__main__":
     import sys
