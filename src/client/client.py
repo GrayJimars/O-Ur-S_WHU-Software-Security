@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from PyQt5 import QtCore, QtWidgets
 from Ui_client import *
-import socket
 import asyncio
 import qasync
 from operation_modules import *
+
 
 class Client(Ui_ClientMainWindow, QtWidgets.QMainWindow):
     def __init__(self):
@@ -13,11 +13,13 @@ class Client(Ui_ClientMainWindow, QtWidgets.QMainWindow):
         self.fileManager.clicked.connect(self.fileManagerClicked)
 
     def append_log(self, message):
-        QtCore.QMetaObject.invokeMethod(self.textBrowser, "append", QtCore.Q_ARG(str, message))
+        QtCore.QMetaObject.invokeMethod(
+            self.textBrowser, "append", QtCore.Q_ARG(str, message))
 
     def fileManagerClicked(self):
         loop = asyncio.get_event_loop()
-        loop.create_task(fileManager(self, server_address))
+        loop.create_task(fileManager(self))
+
 
 if __name__ == "__main__":
     import sys
