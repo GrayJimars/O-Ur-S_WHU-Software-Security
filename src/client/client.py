@@ -16,11 +16,6 @@ class Client(Ui_ClientMainWindow, QtWidgets.QMainWindow):
         QtCore.QMetaObject.invokeMethod(self.textBrowser, "append", QtCore.Q_ARG(str, message))
 
     def fileManagerClicked(self):
-        server_host = socket.gethostname()
-        server_port = 25566
-        server_address = (server_host, server_port)
-        self.append_log(f"[*] Connecting to: {server_host}:{server_port}")
-
         loop = asyncio.get_event_loop()
         loop.create_task(fileManager(self, server_address))
 

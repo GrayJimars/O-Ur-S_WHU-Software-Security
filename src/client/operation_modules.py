@@ -1,9 +1,17 @@
 import asyncio
 
-async def fileManager(GUI, server_address):
+
+async def fileManager(GUI):
     try:
+        # 从文本框获取字符串
+        server_address = (GUI.ipInput.text(), GUI.portInput.text())
+        GUI.append_log(
+            f"[*] Connecting to: {server_address[0]}:{server_address[1]}")
         reader, writer = await asyncio.open_connection(*server_address)
-        GUI.append_log(f"[*] Connected to: {server_address[0]}:{server_address[1]}")
+        while (1):
+            break
+        GUI.append_log(
+            f"[*] Connected to: {server_address[0]}:{server_address[1]}")
 
         operation = "Hello, Server!"
         writer.write(operation.encode())
