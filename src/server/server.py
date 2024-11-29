@@ -15,7 +15,7 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.serverState.setText("Not Listening")
+        self.serverState.setText("停止监听")
         self.server_task = None
         self.loop = asyncio.new_event_loop()
         self.startServer.clicked.connect(self.startServerClicked)
@@ -48,18 +48,18 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
 
     async def start_server(self, client_address):
         self.log_message(
-            f"[*] Starting server on {client_address[0]}:{client_address[1]}")
-        self.serverState.setText("Listening")
+            f"[*] 正在启动服务器，监听地址为 {client_address[0]}:{client_address[1]}")
+        self.serverState.setText("监听中")
         try:
             server = await asyncio.start_server(self.handle_client, *client_address)
             self.log_message(
-                f"[*] Server is running on {client_address[0]}:{client_address[1]}")
+                f"[*] 服务器已启动，正在监听 {client_address[0]}:{client_address[1]}")
             async with server:
                 self.server_task = server
                 await server.serve_forever()
         except Exception as e:
-            self.log_message(f"[!] An error occurred: {e}")
-            self.serverState.setText("Not Listening")
+            self.log_message(f"[!] 错误: {e}")
+            self.serverState.setText("停止监听")
 
     def stopServerClicked(self):
         self.startServer.setEnabled(True)
@@ -67,8 +67,8 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
         if self.server_task:
             self.server_task.close()
             self.loop.call_soon_threadsafe(self.loop.stop)
-            self.serverState.setText("Stopped")
-            self.log_message("[*] Server stopped")
+            self.serverState.setText("停止监听")
+            self.log_message("[*] 服务器已停止监听")
 
     async def handle_client(self, reader, writer):
         addr = writer.get_extra_info('peername')
@@ -80,19 +80,21 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
 
         if confirm == QMessageBox.No:
             self.log_message(
-                f"[*] Connection from {addr[0]}:{addr[1]} rejected")
+                f"[*] 来自 {addr[0]}:{addr[1]} 的连接请求被拒绝")
             writer.close()
             await writer.wait_closed()
             return
         else:
+            if addr[0] not in self.whiteList.values():
+                self.log_message(f"[*] 地址 {addr[0]} 被加入白名单")
             self.whiteList[addr[1]] = addr[0]
 
-        self.log_message(f"[*] Connection from {addr[0]}:{addr[1]} accepted")
+        self.log_message(f"[*] 来自 {addr[0]}:{addr[1]} 的连接请求已接受")
 
         operation = await reader.read(1024)
         if not operation:
             self.log_message(
-                f"[*] Blank operation received from {addr[0]}:{addr[1]}")
+                f"[*] 空白操作请求来自 {addr[0]}:{addr[1]}，连接将关闭")
             writer.close()
             await writer.wait_closed()
             return
@@ -103,57 +105,59 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
         # 根据操作类型调用不同的处理函数
         if operation_str == "fileManager":
             operation = "File manager opened"
-            self.log_message(f"[*] File manager opened by {addr[0]}:{addr[1]}")
+            self.log_message(f"[*] 文件管理器已被 {addr[0]}:{addr[1]} 打开")
             writer.write(operation.encode())
             await writer.drain()
             await open_file_manager(self, writer, reader)
         elif operation_str == "regManager":
             operation = "Register manager opened"
             self.log_message(
-                f"[*] Register manager opened by {addr[0]}:{addr[1]}")
+                f"[*] 注册表管理器已被 {addr[0]}:{addr[1]} 打开")
             writer.write(operation.encode())
             await writer.drain()
             await open_reg_manager(self, writer, reader)
         elif operation_str == "openCamera":
             operation = "Camera opened"
-            self.log_message(f"[*] Camera opened by {addr[0]}:{addr[1]}")
+            self.log_message(f"[*] 摄像头已被 {addr[0]}:{addr[1]} 打开")
             writer.write(operation.encode())
             await writer.drain()
             await open_camera(self, writer, reader)
         elif operation_str == "openMicrophone":
             operation = "Microphone opened"
-            self.log_message(f"[*] Microphone opened by {addr[0]}:{addr[1]}")
+            self.log_message(f"[*] 麦克风已被 {addr[0]}:{addr[1]} 打开")
             writer.write(operation.encode())
             await writer.drain()
             await open_microphone(self, writer, reader)
         elif operation_str == "keylogger":
             operation = "Keylogger started"
-            self.log_message(f"[*] Keylogger started by {addr[0]}:{addr[1]}")
+            self.log_message(f"[*] 键盘记录器已被 {addr[0]}:{addr[1]} 打开")
             writer.write(operation.encode())
             await writer.drain()
             await start_keylogger(self, writer, reader)
         else:
-            self.log_message(f"[*] Unknown operation: {operation_str}")
+            self.log_message(f"[*] 未知操作请求来自 {addr[0]}:{addr[1]}，连接将关闭")
             writer.close()
             await writer.wait_closed()
             return
 
-        self.log_message(f"[*] Connection with {addr[0]}:{addr[1]} closed")
+        self.log_message(f"[*] 来自 {addr[0]}:{addr[1]} 的连接已关闭")
         self.whiteList.pop(addr[1])
+        if addr[0] not in self.whiteList.values():
+            self.log_message(f"[*] 地址 {addr[0]} 已从白名单中移除")
 
     async def ask_connection_permission(self, host, port):
         future = asyncio.Future()
         self.connection_request_signal.emit(host, port, future)
         self.log_message(
-            f"[*] Signal emitted for connection from {host}:{port}")
+            f"[*] 为来自 {host}:{port} 的连接请求确认")
         return await future
 
     @QtCore.pyqtSlot(str, int, object)
     def show_connection_request(self, host, port, future):
         confirm = QMessageBox.question(
             self,
-            "Connection Request",
-            f"Accept connection from {host}:{port}?",
+            "连接请求",
+            f"来自 {host}:{port} 的连接请求，是否接受？",
             QMessageBox.Yes | QMessageBox.No
         )
         self.loop.call_soon_threadsafe(future.set_result, confirm)

