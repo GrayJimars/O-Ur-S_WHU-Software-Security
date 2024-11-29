@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'e:\Coding\GitHub\O-Ur-S_WHU-Software-Security\src\client\client.ui'
+# Form implementation generated from reading ui file 'client.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -41,6 +41,12 @@ class Ui_ClientMainWindow(object):
         self.portInput = QtWidgets.QLineEdit(self.verticalLayoutWidget)
         self.portInput.setObjectName("portInput")
         self.horizontalLayout.addWidget(self.portInput)
+        self.Connect = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.Connect.setObjectName("Connect")
+        self.horizontalLayout.addWidget(self.Connect)
+        self.disConnect = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.disConnect.setObjectName("disConnect")
+        self.horizontalLayout.addWidget(self.disConnect)
         self.fileManager = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.fileManager.setObjectName("fileManager")
         self.horizontalLayout.addWidget(self.fileManager)
@@ -70,6 +76,8 @@ class Ui_ClientMainWindow(object):
         ClientMainWindow.setWindowTitle(_translate("ClientMainWindow", "客户端（控制端）"))
         self.label.setText(_translate("ClientMainWindow", "服务端地址"))
         self.label_2.setText(_translate("ClientMainWindow", "服务端端口"))
+        self.Connect.setText(_translate("ClientMainWindow", "连接"))
+        self.disConnect.setText(_translate("ClientMainWindow", "断开连接"))
         self.fileManager.setText(_translate("ClientMainWindow", "文件管理"))
         self.regManager.setText(_translate("ClientMainWindow", "注册表管理"))
         self.openCamera.setText(_translate("ClientMainWindow", "开启摄像头"))
