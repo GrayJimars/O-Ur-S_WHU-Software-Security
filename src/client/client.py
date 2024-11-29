@@ -18,16 +18,16 @@ class Client(Ui_ClientMainWindow, QtWidgets.QMainWindow):
         self.Connect.clicked.connect(self.connect)
         self.disConnect.clicked.connect(self.disconnect)
         self.connections = {
-        'fileManager': {'reader': None, 'writer': None},
-        'regManager': {'reader': None, 'writer': None},
-        'openCamera': {'reader': None, 'writer': None},
-        'openMicrophone': {'reader': None, 'writer': None},
-        'keylogger': {'reader': None, 'writer': None}
-}
-
+            'fileManager': {'reader': None, 'writer': None},
+            'regManager': {'reader': None, 'writer': None},
+            'openCamera': {'reader': None, 'writer': None},
+            'openMicrophone': {'reader': None, 'writer': None},
+            'keylogger': {'reader': None, 'writer': None}
+        }
 
     def append_log(self, message):
-        QtCore.QMetaObject.invokeMethod(self.textBrowser, "append", QtCore.Q_ARG(str, message))
+        QtCore.QMetaObject.invokeMethod(
+            self.textBrowser, "append", QtCore.Q_ARG(str, message))
 
     def connect(self):
         loop = asyncio.get_event_loop()
@@ -56,6 +56,7 @@ class Client(Ui_ClientMainWindow, QtWidgets.QMainWindow):
     def openMicrophoneClicked(self):
         loop = asyncio.get_event_loop()
         loop.create_task(openmicrophone(self))
+
 
 if __name__ == "__main__":
     import sys

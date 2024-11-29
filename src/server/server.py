@@ -7,8 +7,10 @@ from PyQt5 import QtCore, QtWidgets
 from Ui_server import *
 from operation_modules import *
 
+
 class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
-    connection_request_signal = QtCore.pyqtSignal(str, int, object, name='connectionRequestSignal')
+    connection_request_signal = QtCore.pyqtSignal(
+        str, int, object, name='connectionRequestSignal')
 
     def __init__(self):
         super().__init__()
@@ -19,6 +21,7 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
         self.startServer.clicked.connect(self.startServerClicked)
         self.stopServer.clicked.connect(self.stopServerClicked)
         self.connection_request_signal.connect(self.show_connection_request)
+        self.whiteList = {}
 
     def log_message(self, message):
         QtCore.QMetaObject.invokeMethod(
@@ -31,12 +34,12 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
     def startServerClicked(self):
         self.startServer.setEnabled(False)
         self.stopServer.setEnabled(True)
-        client_host = socket.gethostname()
+        client_host = "localhost"
         client_port = 25566
         client_address = (client_host, client_port)
 
-        # ����һ���¼�ѭ�����з�����
-        asyncio.run_coroutine_threadsafe(self.start_server(client_address), self.loop)
+        asyncio.run_coroutine_threadsafe(
+            self.start_server(client_address), self.loop)
         threading.Thread(target=self.run_event_loop, daemon=True).start()
 
     def run_event_loop(self):
@@ -44,11 +47,13 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
         self.loop.run_forever()
 
     async def start_server(self, client_address):
-        self.log_message(f"[*] Starting server on {client_address[0]}:{client_address[1]}")
+        self.log_message(
+            f"[*] Starting server on {client_address[0]}:{client_address[1]}")
         self.serverState.setText("Listening")
         try:
             server = await asyncio.start_server(self.handle_client, *client_address)
-            self.log_message(f"[*] Server is running on {client_address[0]}:{client_address[1]}")
+            self.log_message(
+                f"[*] Server is running on {client_address[0]}:{client_address[1]}")
             async with server:
                 self.server_task = server
                 await server.serve_forever()
@@ -68,54 +73,65 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
     async def handle_client(self, reader, writer):
         addr = writer.get_extra_info('peername')
 
-        # �첽�������߳�ȷ���Ƿ��������
-        confirm = await self.ask_connection_permission(addr[0], addr[1])
+        if addr[0] not in self.whiteList.values():
+            confirm = await self.ask_connection_permission(addr[0], addr[1])
+        else:
+            confirm = QMessageBox.Yes
+
         if confirm == QMessageBox.No:
-            self.log_message(f"[*] Connection from {addr[0]}:{addr[1]} rejected")
+            self.log_message(
+                f"[*] Connection from {addr[0]}:{addr[1]} rejected")
             writer.close()
             await writer.wait_closed()
             return
+        else:
+            self.whiteList[addr[1]] = addr[0]
 
         self.log_message(f"[*] Connection from {addr[0]}:{addr[1]} accepted")
 
-        # ��ȡ�ͻ��˷��͵�����
-        self.log_message(f"[*] Waiting for operation from {addr[0]}:{addr[1]}...")
         operation = await reader.read(1024)
         if not operation:
-            self.log_message(f"[*] Blank operation received from {addr[0]}:{addr[1]}")
+            self.log_message(
+                f"[*] Blank operation received from {addr[0]}:{addr[1]}")
             writer.close()
             await writer.wait_closed()
             return
 
         # 解码操作内容
         operation_str = operation.decode('utf-8').strip()
-        
+
         # 根据操作类型调用不同的处理函数
         if operation_str == "fileManager":
             operation = "File manager opened"
+            self.log_message(f"[*] File manager opened by {addr[0]}:{addr[1]}")
             writer.write(operation.encode())
             await writer.drain()
-            await open_file_manager(self,writer,reader)
+            await open_file_manager(self, writer, reader)
         elif operation_str == "regManager":
             operation = "Register manager opened"
+            self.log_message(
+                f"[*] Register manager opened by {addr[0]}:{addr[1]}")
             writer.write(operation.encode())
             await writer.drain()
-            await open_reg_manager(self,writer,reader)
+            await open_reg_manager(self, writer, reader)
         elif operation_str == "openCamera":
             operation = "Camera opened"
+            self.log_message(f"[*] Camera opened by {addr[0]}:{addr[1]}")
             writer.write(operation.encode())
             await writer.drain()
-            await open_camera(self,writer,reader)
+            await open_camera(self, writer, reader)
         elif operation_str == "openMicrophone":
             operation = "Microphone opened"
+            self.log_message(f"[*] Microphone opened by {addr[0]}:{addr[1]}")
             writer.write(operation.encode())
             await writer.drain()
-            await open_microphone(self,writer,reader)
+            await open_microphone(self, writer, reader)
         elif operation_str == "keylogger":
             operation = "Keylogger started"
+            self.log_message(f"[*] Keylogger started by {addr[0]}:{addr[1]}")
             writer.write(operation.encode())
             await writer.drain()
-            await start_keylogger(self,writer,reader)
+            await start_keylogger(self, writer, reader)
         else:
             self.log_message(f"[*] Unknown operation: {operation_str}")
             writer.close()
@@ -123,23 +139,23 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
             return
 
         self.log_message(f"[*] Connection with {addr[0]}:{addr[1]} closed")
+        self.whiteList.pop(addr[1])
 
     async def ask_connection_permission(self, host, port):
         future = asyncio.Future()
         self.connection_request_signal.emit(host, port, future)
-        self.log_message(f"[*] Signal emitted for connection from {host}:{port}")
+        self.log_message(
+            f"[*] Signal emitted for connection from {host}:{port}")
         return await future
 
     @QtCore.pyqtSlot(str, int, object)
     def show_connection_request(self, host, port, future):
-        # ʹ�� Qt ���¼����Ʊ�������
         confirm = QMessageBox.question(
             self,
             "Connection Request",
             f"Accept connection from {host}:{port}?",
             QMessageBox.Yes | QMessageBox.No
         )
-        # ʹ�� call_soon_threadsafe ȷ���̰߳�ȫ������ future �Ľ��
         self.loop.call_soon_threadsafe(future.set_result, confirm)
 
     def closeEvent(self, event):
