@@ -52,7 +52,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="ipInput"/>
+        <widget class="QLineEdit" name="ipInput">
+         <property name="text">
+          <string>localhost</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_2">
@@ -62,7 +66,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="portInput"/>
+        <widget class="QLineEdit" name="portInput">
+         <property name="text">
+          <string>25566</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="fileManager">

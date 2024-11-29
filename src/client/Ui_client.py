@@ -69,7 +69,9 @@ class Ui_ClientMainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         ClientMainWindow.setWindowTitle(_translate("ClientMainWindow", "客户端（控制端）"))
         self.label.setText(_translate("ClientMainWindow", "服务端地址"))
+        self.ipInput.setText(_translate("ClientMainWindow", "localhost"))
         self.label_2.setText(_translate("ClientMainWindow", "服务端端口"))
+        self.portInput.setText(_translate("ClientMainWindow", "25566"))
         self.fileManager.setText(_translate("ClientMainWindow", "文件管理"))
         self.regManager.setText(_translate("ClientMainWindow", "注册表管理"))
         self.openCamera.setText(_translate("ClientMainWindow", "开启摄像头"))

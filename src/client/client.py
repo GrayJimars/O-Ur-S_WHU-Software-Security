@@ -13,8 +13,7 @@ class Client(Ui_ClientMainWindow, QtWidgets.QMainWindow):
         self.fileManager.clicked.connect(self.fileManagerClicked)
 
     def append_log(self, message):
-        QtCore.QMetaObject.invokeMethod(
-            self.textBrowser, "append", QtCore.Q_ARG(str, message))
+        QtCore.QMetaObject.invokeMethod(self.textBrowser, "append", QtCore.Q_ARG(str, message))
 
     def fileManagerClicked(self):
         loop = asyncio.get_event_loop()
