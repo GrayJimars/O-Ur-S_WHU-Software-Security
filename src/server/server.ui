@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>240</height>
+    <width>640</width>
+    <height>480</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>320</width>
-    <height>240</height>
+    <width>640</width>
+    <height>480</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>320</width>
-    <height>240</height>
+    <width>640</width>
+    <height>480</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -31,13 +31,13 @@
      <rect>
       <x>-1</x>
       <y>-1</y>
-      <width>321</width>
-      <height>241</height>
+      <width>641</width>
+      <height>481</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,2,0">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0">
        <item>
         <widget class="QLabel" name="label0">
          <property name="text">
@@ -71,6 +71,45 @@
         </layout>
        </item>
       </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>地址</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="ipInput">
+         <property name="text">
+          <string>localhost</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>端口</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="portInput">
+         <property name="text">
+          <string>25566</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>日志</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QTextBrowser" name="textBrowser"/>

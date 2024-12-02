@@ -10,8 +10,7 @@ async def clientFileManager(GUI, writer, reader, operation):
         writer.write(serverPath.encode())
         await writer.drain()
         fileList = await reader.read(1024)
-        fileList = " ".join(fileList.decode())
-        GUI.fileManagerOutput.append(fileList)
+        GUI.fileManagerOutput.append(fileList.decode())
 
     elif operation == "fileDownload":
         clientPath = GUI.clientFilePath.text()

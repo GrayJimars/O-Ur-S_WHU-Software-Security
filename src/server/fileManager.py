@@ -11,6 +11,7 @@ async def serverFileManager(GUI, writer, reader, operation):
         # GUI.log_message(f"[*] 路径: {serverPath.decode()}")
         try:
             fileList = os.listdir(serverPath.decode())
+            fileList = " ".join(fileList)
             writer.write(f"{fileList}".encode())
             await writer.drain()
         except Exception as e:

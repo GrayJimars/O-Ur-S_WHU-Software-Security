@@ -34,8 +34,8 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
     def startServerClicked(self):
         self.startServer.setEnabled(False)
         self.stopServer.setEnabled(True)
-        client_host = "localhost"
-        client_port = 25566
+        client_host = self.ipInput.text()
+        client_port = self.portInput.text()
         client_address = (client_host, client_port)
 
         asyncio.run_coroutine_threadsafe(

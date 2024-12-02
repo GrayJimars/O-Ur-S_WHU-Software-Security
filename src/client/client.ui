@@ -35,7 +35,7 @@
       <height>800</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,1,16">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,1,0,16">
      <property name="sizeConstraint">
       <enum>QLayout::SetMaximumSize</enum>
      </property>
@@ -260,15 +260,40 @@
       </widget>
      </item>
      <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>日志</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>文件管理</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>注册表管理</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QTextBrowser" name="textBrowser"/>
        </item>
        <item>
-        <widget class="QTextBrowser" name="regManagerOutput"/>
+        <widget class="QTextBrowser" name="fileManagerOutput"/>
        </item>
        <item>
-        <widget class="QTextBrowser" name="fileManagerOutput"/>
+        <widget class="QTextBrowser" name="regManagerOutput"/>
        </item>
       </layout>
      </item>
