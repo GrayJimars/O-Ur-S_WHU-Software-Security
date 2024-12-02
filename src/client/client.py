@@ -10,13 +10,20 @@ class Client(Ui_ClientMainWindow, QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.fileManager.clicked.connect(self.fileManagerClicked)
         self.keylogger.clicked.connect(self.keyloggerClicked)
-        self.regManager.clicked.connect(self.regManagerClicked)
         self.openMicrophone.clicked.connect(self.openMicrophoneClicked)
         self.openCamera.clicked.connect(self.openCameraClicked)
         self.Connect.clicked.connect(self.connect)
         self.disConnect.clicked.connect(self.disconnect)
+        self.fileList.clicked.connect(
+            lambda: self.fileManagerClicked("fileList"))
+        self.fileDownload.clicked.connect(
+            lambda: self.fileManagerClicked("fileDownload"))
+        self.fileUpload.clicked.connect(
+            lambda: self.fileManagerClicked("fileUpload"))
+        self.fileExcute.clicked.connect(
+            lambda: self.fileManagerClicked("fileExcute"))
+
         self.connections = {
             'fileManager': {'reader': None, 'writer': None},
             'regManager': {'reader': None, 'writer': None},
@@ -37,9 +44,9 @@ class Client(Ui_ClientMainWindow, QtWidgets.QMainWindow):
         loop = asyncio.get_event_loop()
         loop.create_task(disconnected(self))
 
-    def fileManagerClicked(self):
+    def fileManagerClicked(self, operation):
         loop = asyncio.get_event_loop()
-        loop.create_task(fileManager(self))
+        loop.create_task(fileManager(self, operation))
 
     def regManagerClicked(self):
         loop = asyncio.get_event_loop()

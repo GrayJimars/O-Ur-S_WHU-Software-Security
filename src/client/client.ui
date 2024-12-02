@@ -35,7 +35,7 @@
       <height>800</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,1,16">
      <property name="sizeConstraint">
       <enum>QLayout::SetMaximumSize</enum>
      </property>
@@ -87,20 +87,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="fileManager">
-         <property name="text">
-          <string>文件管理</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="regManager">
-         <property name="text">
-          <string>注册表管理</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QPushButton" name="openCamera">
          <property name="text">
           <string>开启摄像头</string>
@@ -124,7 +110,167 @@
       </layout>
      </item>
      <item>
-      <widget class="QTextBrowser" name="textBrowser"/>
+      <widget class="QGroupBox" name="fileManegerGroup">
+       <property name="title">
+        <string>文件管理</string>
+       </property>
+       <widget class="QWidget" name="horizontalLayoutWidget_2">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>1261</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QPushButton" name="fileList">
+           <property name="text">
+            <string>浏览文件夹</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="fileDownload">
+           <property name="text">
+            <string>下载文件</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="fileUpload">
+           <property name="text">
+            <string>上传文件</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="fileExcute">
+           <property name="text">
+            <string>执行文件</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>客户端路径</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="clientFilePath">
+           <property name="text">
+            <string>C:\OYSFiles</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>服务端路径</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="serverFilePath">
+           <property name="text">
+            <string>C:\OYSFiles</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="regManegerGroup">
+       <property name="title">
+        <string>注册表管理</string>
+       </property>
+       <widget class="QWidget" name="horizontalLayoutWidget_6">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>1261</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,0,0,0,0,0,1">
+         <item>
+          <widget class="QPushButton" name="regAdd">
+           <property name="text">
+            <string>添加</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="regDelete">
+           <property name="text">
+            <string>删除</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="regEdit">
+           <property name="text">
+            <string>修改</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="regSearch">
+           <property name="text">
+            <string>查找</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>注册表值</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="regValueInput">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>服务端注册表路径</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="serverRegPath">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QTextBrowser" name="textBrowser"/>
+       </item>
+       <item>
+        <widget class="QTextBrowser" name="regManagerOutput"/>
+       </item>
+       <item>
+        <widget class="QTextBrowser" name="fileManagerOutput"/>
+       </item>
+      </layout>
      </item>
     </layout>
    </widget>

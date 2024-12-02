@@ -108,6 +108,7 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
             self.log_message(f"[*] 文件管理器已被 {addr[0]}:{addr[1]} 打开")
             writer.write(operation.encode())
             await writer.drain()
+            # self.log_message(f"[*] 文件管理器确认")
             await open_file_manager(self, writer, reader)
         elif operation_str == "regManager":
             operation = "Register manager opened"
