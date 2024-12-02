@@ -28,6 +28,15 @@ class Client(Ui_ClientMainWindow, QtWidgets.QMainWindow):
         self.fileExcute.clicked.connect(
             lambda: self.fileManagerClicked("fileExcute"))
 
+        self.regAdd.clicked.connect(
+            lambda: self.regManagerClicked("add"))
+        self.regDelete.clicked.connect(
+            lambda: self.regManagerClicked("delete"))
+        self.regEdit.clicked.connect(
+            lambda: self.regManagerClicked("modify"))
+        self.regSearch.clicked.connect(
+            lambda: self.regManagerClicked("find"))
+        
         self.connections = {
             'fileManager': {'reader': None, 'writer': None},
             'regManager': {'reader': None, 'writer': None},
@@ -52,9 +61,9 @@ class Client(Ui_ClientMainWindow, QtWidgets.QMainWindow):
         loop = asyncio.get_event_loop()
         loop.create_task(fileManager(self, operation))
 
-    def regManagerClicked(self):
+    def regManagerClicked(self,action):
         loop = asyncio.get_event_loop()
-        loop.create_task(regmanager(self))
+        loop.create_task(regmanager(self,action))
 
     def keyloggerClicked(self):
         loop = asyncio.get_event_loop()
