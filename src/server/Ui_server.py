@@ -17,6 +17,9 @@ class Ui_ServerMainWindow(object):
         ServerMainWindow.resize(640, 480)
         ServerMainWindow.setMinimumSize(QtCore.QSize(640, 480))
         ServerMainWindow.setMaximumSize(QtCore.QSize(640, 480))
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/icon/logo_icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        ServerMainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(ServerMainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
@@ -84,3 +87,4 @@ class Ui_ServerMainWindow(object):
         self.label_3.setText(_translate("ServerMainWindow", "端口"))
         self.portInput.setText(_translate("ServerMainWindow", "25566"))
         self.label.setText(_translate("ServerMainWindow", "日志"))
+import server_rc

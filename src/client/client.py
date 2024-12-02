@@ -3,6 +3,7 @@ from PyQt5 import QtCore, QtWidgets
 from Ui_client import *
 import asyncio
 import qasync
+import ctypes
 from operation_modules import *
 
 
@@ -10,6 +11,9 @@ class Client(Ui_ClientMainWindow, QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+            "myappid")
+
         self.keylogger.clicked.connect(self.keyloggerClicked)
         self.openMicrophone.clicked.connect(self.openMicrophoneClicked)
         self.openCamera.clicked.connect(self.openCameraClicked)
@@ -69,7 +73,10 @@ if __name__ == "__main__":
     import sys
     from PyQt5.QtWidgets import QApplication
 
+    QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
+
     app = QApplication(sys.argv)
+
     client = Client()
     client.show()
 

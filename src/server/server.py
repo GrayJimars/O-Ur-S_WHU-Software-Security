@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import socket
 import asyncio
 import threading
+import ctypes
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore, QtWidgets
 from Ui_server import *
@@ -15,6 +15,9 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+            "myappid")
+
         self.serverState.setText("停止监听")
         self.server_task = None
         self.loop = asyncio.new_event_loop()

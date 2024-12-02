@@ -25,6 +25,10 @@
   <property name="windowTitle">
    <string>客户端（控制端）</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="client.qrc">
+    <normaloff>:/icon/gui_icon.png</normaloff>:/icon/gui_icon.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
@@ -301,6 +305,8 @@
    </widget>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="client.qrc"/>
+ </resources>
  <connections/>
 </ui>

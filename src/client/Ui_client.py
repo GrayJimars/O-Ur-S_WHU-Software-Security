@@ -17,6 +17,9 @@ class Ui_ClientMainWindow(object):
         ClientMainWindow.resize(1280, 800)
         ClientMainWindow.setMinimumSize(QtCore.QSize(1280, 800))
         ClientMainWindow.setMaximumSize(QtCore.QSize(1280, 800))
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/icon/gui_icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        ClientMainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(ClientMainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
@@ -189,3 +192,4 @@ class Ui_ClientMainWindow(object):
         self.label_5.setText(_translate("ClientMainWindow", "日志"))
         self.label_7.setText(_translate("ClientMainWindow", "文件管理"))
         self.label_6.setText(_translate("ClientMainWindow", "注册表管理"))
+import client_rc
