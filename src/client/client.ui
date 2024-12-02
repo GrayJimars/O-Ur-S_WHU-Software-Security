@@ -202,7 +202,7 @@
           <height>31</height>
          </rect>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,0,0,0,0,0,1">
+        <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,0,0,0,0,0,0,0,1,0,0">
          <item>
           <widget class="QPushButton" name="regAdd">
            <property name="text">
@@ -234,7 +234,7 @@
          <item>
           <widget class="QLabel" name="label_11">
            <property name="text">
-            <string>注册表值</string>
+            <string>注册表  值</string>
            </property>
           </widget>
          </item>
@@ -248,16 +248,36 @@
          <item>
           <widget class="QLabel" name="label_12">
            <property name="text">
-            <string>服务端注册表路径</string>
+            <string>根键</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="serverRegPath">
+          <widget class="QLineEdit" name="regRootKey">
            <property name="text">
             <string/>
            </property>
           </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>路径</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="regPath"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>键名</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="regKeyName"/>
          </item>
         </layout>
        </widget>
