@@ -174,6 +174,7 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
 if __name__ == "__main__":
     import sys
     from qasync import QEventLoop
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
     app = QtWidgets.QApplication(sys.argv)
     loop = QEventLoop(app)
     asyncio.set_event_loop(loop)
