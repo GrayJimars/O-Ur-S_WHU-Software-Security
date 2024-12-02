@@ -241,7 +241,7 @@
          <item>
           <widget class="QLineEdit" name="regValueInput">
            <property name="text">
-            <string/>
+            <string>TestValue</string>
            </property>
           </widget>
          </item>
@@ -255,7 +255,7 @@
          <item>
           <widget class="QLineEdit" name="regRootKey">
            <property name="text">
-            <string/>
+            <string>HKEY_LOCAL_MACHINE</string>
            </property>
           </widget>
          </item>
@@ -267,7 +267,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="regPath"/>
+          <widget class="QLineEdit" name="regPath">
+           <property name="text">
+            <string>Software\\MySoftware</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_9">
@@ -277,7 +281,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="regKeyName"/>
+          <widget class="QLineEdit" name="regKeyName">
+           <property name="text">
+            <string>TestKey</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
