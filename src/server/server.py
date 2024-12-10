@@ -6,6 +6,9 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore, QtWidgets
 from Ui_server import *
 from operation_modules import *
+import random
+import socket
+
 
 
 class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
@@ -25,6 +28,17 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
         self.stopServer.clicked.connect(self.stopServerClicked)
         self.connection_request_signal.connect(self.show_connection_request)
         self.whiteList = {}
+
+    def get_random_available_port(self):
+        while True:
+            # 生成一个随机端口号，范围在1024到65535之间
+            port = random.randint(1024, 65535)
+            # 尝试创建一个socket并绑定到该端口，检查端口是否可用
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                result = s.connect_ex(('localhost', port))
+                # connect_ex() 返回 0 表示端口可用
+                if result != 0:
+                    return port  # 如果端口可用，返回该端口
 
     def log_message(self, message):
         QtCore.QMetaObject.invokeMethod(
@@ -49,11 +63,83 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
         asyncio.set_event_loop(self.loop)
         self.loop.run_forever()
 
+    def get_local_ip(self):
+        # 获取本地机器的主机名
+        hostname = socket.gethostname()
+        
+        # 获取本地机器的 IP 地址
+        local_ip = socket.gethostbyname(hostname)
+        
+        return local_ip
+
+    async def send_receive_for_client(self, target_address, data):
+        try:
+            data = f"{data[0]}:{data[1]}"
+            reader, writer = await asyncio.open_connection(target_address[0], target_address[1])
+            writer.write(data.encode())
+            await writer.drain()
+            self.log_message(f"已向 {target_address[0]}:{target_address[1]} 发送数据: {data}")
+            try:
+                # 使用 asyncio.wait_for 设置 5 秒超时时间
+                response = await asyncio.wait_for(reader.read(1024), timeout=5)  # 假设最大响应长度为1024字节
+                self.log_message(f"收到客户端 {target_address[0]}:{target_address[1]} 的回复: {response.decode()}")
+                writer.close()
+                await writer.wait_closed()
+                return response.decode()
+            except asyncio.TimeoutError:
+                self.log_message("[!] 接收数据超时（5 秒），未收到客户端回复。")
+                writer.close()
+                await writer.wait_closed()
+                return None
+        except Exception as e:
+            self.log_message(f"发送数据失败！{e}")
+            try:
+                writer.close()
+                await writer.wait_closed()
+                return None
+            except:
+                return None
+
+    async def wait_for_client_reply(self, target_address, client_address):
+        try:
+            while True:
+                try:
+                    self.log_message(f"正在向 {target_address[0]}:{target_address[1]} 发送 IP 和端口信息...")
+                    # 等待客户端回复，并设置超时时间为5秒
+                    reply = await self.send_receive_for_client(target_address,client_address)
+                    if(reply != None):
+                        # 如果接收到客户端的回复，退出循环
+                        self.log_message("客户端已回复，停止发送数据。")
+                        break  # 收到回复，跳出循环
+                    elif(self.startServer.isEnabled()):
+                        self.log_message("正在停止服务")
+                        break
+                except asyncio.TimeoutError:
+                    # 如果超时没有收到回复，继续发送数据并等待
+                    self.log_message("[!] 超时，继续等待客户端回复...")
+        except Exception as e:
+            self.log_message(f"[!] 等待客户端回复失败: {e}")
+
+        except Exception as e:
+            # 处理其他错误
+            self.log_message(f"[!] 发生错误: {e}")
+
     async def start_server(self, client_address):
+        random_port = str(self.get_random_available_port())
+        self.portInput.setText(random_port)
+        self.ipInput.setText("0.0.0.0")
+        client_host, client_port = client_address
+        client_address = ("0.0.0.0", random_port)
         self.log_message(
             f"[*] 正在启动服务器，监听地址为 {client_address[0]}:{client_address[1]}")
         self.serverState.setText("监听中")
         try:
+            self.log_message(
+                f"正在连接到客户端......")
+            #每隔5秒向指定ip和端口发送client_address，直到客户端回复receive
+            localip = str(self.get_local_ip())
+            target_address = (localip, '25577')
+            await self.wait_for_client_reply(target_address,(localip,random_port))
             server = await asyncio.start_server(self.handle_client, *client_address)
             self.log_message(
                 f"[*] 服务器已启动，正在监听 {client_address[0]}:{client_address[1]}")
@@ -169,7 +255,6 @@ class Server(Ui_ServerMainWindow, QtWidgets.QMainWindow):
     def closeEvent(self, event):
         self.loop.call_soon_threadsafe(self.loop.stop)
         event.accept()
-
 
 if __name__ == "__main__":
     import sys

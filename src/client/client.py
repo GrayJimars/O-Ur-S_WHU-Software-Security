@@ -45,6 +45,9 @@ class Client(Ui_ClientMainWindow, QtWidgets.QMainWindow):
             'keylogger': {'reader': None, 'writer': None}
         }
 
+        self.target_addr = None
+
+
     def append_log(self, message):
         QtCore.QMetaObject.invokeMethod(
             self.textBrowser, "append", QtCore.Q_ARG(str, message))
