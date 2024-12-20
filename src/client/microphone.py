@@ -3,22 +3,23 @@ import pyaudio
 import struct
 import logging
 
+
 async def receive_voice_stream(GUI):
     """ 接收音频流并播放 """
     print("Waiting for voice stream...")
     # 创建 PyAudio 对象
     p = pyaudio.PyAudio()
-        # 打开音频输出流
+    # 打开音频输出流
     stream = p.open(format=pyaudio.paInt16,
-                        channels=1,
-                        rate=44100,
-                        output=True,
-                        frames_per_buffer=2048)
+                    channels=1,
+                    rate=44100,
+                    output=True,
+                    frames_per_buffer=8192)
     while True:
         try:
             # 读取 1024 字节数据
             data = await asyncio.wait_for(
-                GUI.connections["openMicrophone"]["reader"].read(2000),
+                GUI.connections["openMicrophone"]["reader"].read(4096),
                 timeout=5  # 设置超时时间（5秒）
             )
             if not data:
@@ -28,14 +29,16 @@ async def receive_voice_stream(GUI):
             stream.write(data)
             print(f"Length of data: {len(data)}")  # 打印字符串长度
             if GUI.microphone_check == False:
-                microphone_stop= "stop"
-                GUI.connections["openMicrophone"]["writer"].write(microphone_stop.encode())
+                microphone_stop = "stop"
+                GUI.connections["openMicrophone"]["writer"].write(
+                    microphone_stop.encode())
                 await GUI.connections["openMicrophone"]["writer"].drain()
-                break;
+                break
 
             else:
                 microphone_stop = "go on--"
-                GUI.connections["openMicrophone"]["writer"].write(microphone_stop.encode())
+                GUI.connections["openMicrophone"]["writer"].write(
+                    microphone_stop.encode())
                 await GUI.connections["openMicrophone"]["writer"].drain()
 
         except Exception as e:

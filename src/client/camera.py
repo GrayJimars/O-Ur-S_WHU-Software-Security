@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets, QtGui
 import cv2
 import pickle
 import struct
+import time
 
 
 async def receive_video_stream(GUI):
@@ -9,9 +10,15 @@ async def receive_video_stream(GUI):
     print("Waiting for video stream...")
     video_label = QtWidgets.QLabel()
     video_label.show()
+    last_frame_time = 0
 
     while True:
         try:
+            current_time = time.time()
+            if current_time - last_frame_time * 1.0 < 0.033:  # 控制到约30帧/秒
+                continue
+
+            last_frame_time = current_time
             # 读取图像数据大小（一个32位的无符号长整型）
             size_data = await GUI.connections["openCamera"]["reader"].read(struct.calcsize('L'))
             if not size_data:
