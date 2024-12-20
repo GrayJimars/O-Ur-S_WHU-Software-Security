@@ -1,12 +1,15 @@
-import asyncio
+from PyQt5 import QtWidgets, QtGui
 import cv2
 import pickle
 import struct
-import logging
+
 
 async def receive_video_stream(GUI):
     """ 接收视频流并显示 """
     print("Waiting for video stream...")
+    video_label = QtWidgets.QLabel()
+    video_label.show()
+
     while True:
         try:
             # 读取图像数据大小（一个32位的无符号长整型）
@@ -20,27 +23,33 @@ async def receive_video_stream(GUI):
             while len(data) < size:
                 more_data = await GUI.connections["openCamera"]["reader"].read(size - len(data))
                 if not more_data:
-                    raise Exception("[!] Data was truncated or connection was closed.")
+                    raise Exception(
+                        "[!] Data was truncated or connection was closed.")
                 data += more_data
 
             frame = pickle.loads(data)
 
-            cv2.imshow('Camera Stream', frame)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            # Convert the frame to QImage
+            height, width, channel = frame.shape
+            bytes_per_line = 3 * width
+            q_img = QtGui.QImage(frame.data, width, height,
+                                 bytes_per_line, QtGui.QImage.Format_RGB888)
+            # Display the QImage in the QLabel
+            video_label.setPixmap(QtGui.QPixmap.fromImage(q_img))
+            video_label.resize(width, height)
 
             if GUI.camera_check == False:
                 operation = "stop"
-                GUI.connections["openCamera"]["writer"].write(operation.encode())
+                GUI.connections["openCamera"]["writer"].write(
+                    operation.encode())
                 await GUI.connections["openCamera"]["writer"].drain()
                 break
             else:
                 operation = "go on"
-                GUI.connections["openCamera"]["writer"].write(operation.encode())
+                GUI.connections["openCamera"]["writer"].write(
+                    operation.encode())
                 await GUI.connections["openCamera"]["writer"].drain()
 
         except Exception as e:
             GUI.append_log(f"[!] Error during receiving video stream: {e}")
-            cv2.destroyAllWindows()
-
-    cv2.destroyAllWindows()  # 关闭 OpenCV 窗口
-
-
