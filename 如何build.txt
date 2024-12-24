@@ -2,4 +2,4 @@
 pip install pyinstaller
 在server文件夹执行(同理client)
 pyinstaller --clean --onefile --window --noupx server.py
-exe会保存到生成的dist文件夹
+exe会保存到生成的dist文件夹，需要图标则添加参数--icon=".ico路径"
