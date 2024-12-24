@@ -17,15 +17,15 @@ async def start_voice_stream(writer, reader):
                     channels=1,
                     rate=44100,
                     input=True,
-                    frames_per_buffer=2048)
+                    frames_per_buffer=8192)
 
     try:
         # 循环读取麦克风输入并发送数据
         while True:
             try:
                 # 读取音频数据
-                data = stream.read(512, exception_on_overflow=False)
-                print(f"Length of data: {len(data)}")  # 打印字符串长度
+                data = stream.read(2048, exception_on_overflow=False)
+                # print(f"Length of data: {len(data)}")  # 打印字符串长度
                 # 发送音频数据到连接
                 writer.write(data)
                 await writer.drain()  # 确保数据被传输

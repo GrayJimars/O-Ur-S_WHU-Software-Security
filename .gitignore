@@ -1,3 +1,7 @@
 *.pyc
 *.zip
 /src/server/test.py
+/src/server/build
+/src/server/dist
+/src/client/build
+/src/client/dist
