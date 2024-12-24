@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 async def clientFileManager(GUI, writer, reader, operation):
     if operation == "fileList":
-        serverPath = GUI.clientFilePath.text()
+        serverPath = GUI.serverFilePath.text()
         GUI.fileManagerOutput.append(f"浏览文件夹")
         writer.write(f"fileList".encode())
         await writer.drain()
